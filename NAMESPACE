@@ -1,0 +1,3 @@
+importFrom("stats", "t.test", "wilcox.test")
+
+exportPattern(PBmap, PBtest)
