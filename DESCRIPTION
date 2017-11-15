@@ -1,11 +1,11 @@
 Package: PBtest
 Title: PB-transformed test for two-group comparison with correlated observations and heterogeneous variance structure
 Version: 0.0.0.9000
-Date: 2017-10-12
+Date: 2017-11-15
 Author: Yun Zhang, Xing Qiu 
 Maintainer: Yun Zhang <yun_zhang@urmc.rochester.edu>; Xing Qiu <xing_qiu@urmc.rochester.edu>
-Description: This package implements a data transformation, namely PB-transformation, which maps the original data with correlation and heterogeneous variance to some i.i.d. data. A two-group comparison problem with the original data is also mapped to an equivalent problem where standard parametric and nonparametric tests are applicable.
-Depends: R (>= 3.4.1)
+Description: This package implements a data transformation, namely PB-transformation, which maps data with correlation and heterogeneous variance to an equivalent data that are independent and identically distributed for two-group comparison problem. 
+Depends: R (>= 3.4.1), genefilter
 VignetteBuilder: knitr
 Suggests: knitr, rmarkdown
 License: GPL-3

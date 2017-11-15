@@ -1,3 +1,4 @@
 importFrom("stats", "t.test", "wilcox.test")
+importFrom("genefilter", "rowttests")
 
 exportPattern(PBmap, PBtest)

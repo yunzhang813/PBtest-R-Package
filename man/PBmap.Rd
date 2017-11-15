@@ -1,57 +1,59 @@
-\name{PBmap}
-\alias{PBmap}
+\name{PBtest}
 \alias{PBtest}
+\alias{PBmap}
 %- Also NEED an '\alias' for EACH other topic documented here.
 
 \title{
-  Two-group comparison test with PB-transformation
+  PB-transformed test
 }
 \description{
-  \code{PBmap()} calculates the proposed data transformations, i.e. B-map and P-map, which transform the original data and hypothesis testing problem to the equivalent form that can be tested by standard tests.
+  \code{PBmap} calculates the proposed transformations, i.e. B-map and P-map.
 
-  \code{PBtest()} takes in the original data and conducts parametric t-test or nonparametric Wilcoxon (rank-based) test for the transformed data from \code{PBmap()}.
+  \code{PBtest} conducts PB-transformed parametric or nonparametric test.
 }
 
 \usage{
-PBmap(XX, Sigma, Delta)
-PBtest(XX, Sigma, Delta, test="t", ...)
+PBmap(Delta, Sigma=NULL)
+PBtest(XX, Delta, Sigma=NULL, test="fast.ttest", debug=FALSE, ...)
 }
 
 \arguments{
-  \item{XX}{Data vector of observations combined from both groups.}
-  \item{Sigma}{Covariance matrix for combined data.}
-  \item{Delta}{Numeric vector for groups: one group indicated by 1 and the other group indicated by -1.}
-  \item{test}{Parametric or nonparametric test. Options: \code{"t"} (default) and \code{"wilcox"}.}
-  \item{...}{further arguments to be passed to or from test functions.}
-}
-
-\details{
-%%  ~~ If necessary, more details than the description above ~~
+  \item{XX}{Numeric data matrix.}
+  \item{Sigma}{Covariance matrix. If \code{NULL}, identity matrix will be use.}
+  \item{Delta}{Numeric vector of group indication, indicated by 1 and -1.}
+  \item{test}{Parametric or nonparametric test. Options: \code{"fast.ttest"} (default), \code{"ttest"} and \code{"wilcox"}.}
+  \item{debug}{If \code{TRUE}, it returns a long list of intermediate calculation results.}
+  \item{...}{further arguments to be passed to or from \code{t.test()} or \code{wilcox.test()}.}
 }
 
 \value{
-\code{PBmap()} returns a list of values:
-  \item{sigma.sq}{A scalar value such that \code{sigma.sq*Sigma0=Sigma}.}
-  \item{Sigma0}{Standardized structure matrix.}
-  \item{mu.hat}{Estimated weighted average.}
-  \item{XX.tilde}{Centered data.}
-  \item{Sigma0.tilde}{Strucure matrix for \code{XX.tilde}.}
+\code{PBtest} returns the p-values of the PB-transformed test.
+
+If \code{debug=TRUE}, \code{PBtest} and \code{PBmap} return a long list of values, including:
+  \item{p.value}{P-values.}
+  \item{sigma.sq}{A scalar value. Dcompose the covariance matrix into a scale parameter and a shape parameter, such that \code{Sigma=sigma.sq*Sigma0}.}
+  \item{Sigma0.inv}{Inverse of \code{Sigma0}.}
+  \item{mu.hat}{The weighted average.}
+  \item{XX.tilde}{The centered data.}
+  \item{Sigma0.tilde}{Shape parameter for the centered data.}
   \item{LL}{Diagnal matrix of non-zero eigen-values of \code{Sigma0.tilde}.}
   \item{TT}{Matrix of corresponding eigen-vectors of \code{Sigma0.tilde}.}
   \item{BB}{The B-map.}
-  \item{YY}{Transformed data after B-map.}
-  \item{cc}{Coefficient vector of the transformed alternative hypothesis after B-map.}
+  \item{YY}{B-transformed data.}
+  \item{cc}{The coefficient vector.}
   \item{QQ}{Q matrix of the QR decomposition.}
   \item{RR}{R matrix of the QR decomposition.}
   \item{Rot}{Rotation matrix by construction.}
   \item{PP}{The P-map.}
-  \item{YY.tilde}{Final transformed data.}
-  
-\code{PBtest()} returns the p-value for the overall test.
+  \item{YY.tilde}{PB-transformed data.}
+}
+
+\note{
+In \code{PBtest}, three test options are available. By default, \code{"fast.ttest"} conducts speed efficient t-tests for large-scale data, which uses \code{rwottests()} from the \code{genefilter} package. However, this fast t-test does not provide one-sided test. One-sided test can be specified using \code{(test="ttest", alternative="greater")} or \code{(test="wilcox", alternative="greater")}.
 }
 
 \references{
-%% ~put references to the literature/web site here ~
+  \cite{Zhang, Y., Topham, D.J., Falsey, A.R. and Qiu, X. (2017). Highly Efficient Two-Group Comparison Methods for Correlated Observations with Heterogeneous Variance Structure. \emph{Submited}.}
 }
 
 \author{
@@ -59,7 +61,7 @@ Yun Zhang, Xing Qiu
 }
 
 \seealso{
-  \link{t.test}, \link{wilcox.test}.
+  \code{\link[genefilter]{rowttests}}, \code{\link{t.test}}, \code{\link{wilcox.test}}.
 }
 
 \examples{
@@ -72,31 +74,34 @@ weights <- runif(n, 1, 6)
 corr <- matrix(0.2, n, n)
 diag(corr) <- 1
 Sigma <- diag(weights) \%*\% corr \%*\% diag(weights)
-## An identity matrix.
-Sigma.I <- diag(n)
 
-
-## Data transformation.
-mydat <- PBmap(XX, Sigma, Delta)
-mydat$YY.tilde  #the transformed data
-mydat$BB  #matrix for B-map
-mydat$PP  #matrix for P-map
+## PBmap.
+mymap <- PBmap(Delta, Sigma)
+mymap$BB  #matrix for B-map
+mymap$PP  #matrix for P-map
 
 ## By default, two-sided t-test is performed. 
-PBtest(XX, Sigma, Delta)
+PBtest(XX, Delta, Sigma)
 
+## By default, two-sided t-test is performed. 
+system.time(PBtest(XX, Delta, Sigma)) #speed efficient
+system.time(PBtest(XX, Delta, Sigma, test="ttest"))
 ## One-sided t-test.
-PBtest(XX, Sigma, Delta, alternative="greater")
+PBtest(XX, Delta, Sigma, test="ttest", alternative="greater")
 
 ## Two-sided rank-based test.
-PBtest(XX, Sigma, Delta, test="wilcox")
+PBtest(XX, Delta, Sigma, test="wilcox")
+## One-sided rank-based test.
+PBtest(XX, Delta, Sigma, test="wilcox", alternativ="less")
 
-## If Sigma.I (i.e. identity covariance matrix), compare with standard tests.
-PBtest(XX, Sigma.I, Delta)
-t.test(XX[Delta==1], XX[Delta==-1])$p.value #only numerical difference
-PBtest(XX, Sigma.I, Delta, test="wilcox")
-wilcox.test(XX[Delta==1], XX[Delta==-1])$p.value #difference in p-value
+## If Sigma=NULL (i.e. identity matrix), the parametric test reduces to two-sample t-test.
+PBtest(XX, Delta)
+t.test(XX[Delta==1], XX[Delta==-1], var.equal=TRUE)$p.value
+PBtest(XX, Delta, test="ttest", alternative="greater")
+t.test(XX[Delta==1], XX[Delta==-1], var.equal=TRUE, alternative="greater")$p.value
 
+## debug
+PBtest(XX, Delta, Sigma, debug=TRUE)
 }
 
 % Add one or more standard keywords, see file 'KEYWORDS' in the

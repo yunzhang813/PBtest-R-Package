@@ -2,112 +2,83 @@
 ## PBmap() ##
 #############
 
-PBmap <- function(XX, Sigma, Delta)
+PBmap <- function(Delta, Sigma=NULL)
 {
-  Sigma <- unname(Sigma)
-  
   ## check: input data
-  if((all.equal(Sigma, t(Sigma))) != TRUE)
-  {stop("Error in input data: Sigma should be a symmetric and positive semi-definit matrix.")}
+  if(is.null(Sigma)){Sigma <- diag(length(Delta))}
+  Sigma <- unname(Sigma)
+  if(isSymmetric.matrix(Sigma)!=TRUE){stop("Sigma must be a symmetric matrix.")}
+  if(nrow(Sigma)!=length(Delta)){stop("nrow(Sigma) must be equal to length(Delta).")}
+  if(is.numeric(Delta)!=TRUE){stop("Delta must be a numeric vector.")}
   
   ## Step 1: standardize Sigma
-  
   Sigma.inv <- solve(Sigma)
   sigma.sq <- 1/sum(Sigma.inv)
   Sigma0 <- Sigma/sigma.sq
   Sigma0.inv <- solve(Sigma0)
-  ## check
-  if((all.equal(sum(Sigma-sigma.sq*Sigma0), 0)
-      & all.equal(sum(Sigma0.inv), 1)) != TRUE)
-  {stop("Error in step 1: standardize Sigma matrix.")}
-  
-  ## Step 2: estimate mu.hat (weighted average, i.e. MLE of XX ~ mu.hat*vec(1))
-  
-  mu.hat <- sum(Sigma0.inv%*%XX)
-  
-  ## Step 3: substract mu.hat from XX ==> XX.tilde
-  
-  XX.tilde <- XX - mu.hat
-  
-  n <- length(XX)
+  ## Sigma0.tilde
+  n <- nrow(Sigma)
   JJ <- matrix(1,n,n)
   Sigma0.tilde <- Sigma0 - JJ
-  Sigma.tilde <- sigma.sq*Sigma0.tilde
   
-  ## Step 4: eigen-decomposition (transform the problem to an equivalent problem with identity correlation structure) ==> YY
-  
-  eig <- eigen(Sigma0.tilde)
-  ## check: last eigenvalue is zero
-  if((all.equal(eig$values[length(eig$values)], 0)
-      # & all.equal(sigma.sq*(sum(eig$values)+sum(eigen(JJ)$val))-sum(eigen(Sigma)$val), 0)
-  ) != TRUE)
-  {stop("Error in step 4: eigen-decomposition. Last eigenvalue is not zero.")}
-  
+  ## Step 4: eigen-decomposition
+  eig <- eigen(Sigma0.tilde, symmetric=TRUE)
   LL <- diag(eig$values[-n]) #get rid of the last "zero" eigenvalue
   TT <- eig$vectors[,-n]
-  ## check:
-  if((all.equal(dim(TT), c(n,n-1))
-      & all.equal(dim(LL), c(n-1,n-1))
-      & all.equal(TT %*% LL %*% t(TT), Sigma0.tilde)) != TRUE)
-  {stop("Error in step 4: eigen-decomposition. (Problem with LL and TT matrix).")}
-  
+  ## B-map
   BB <- sqrt(LL) %*% t(TT) %*% Sigma0.inv
-  ## check
-  if((all.equal(dim(BB), c(n-1,n))
-      & all.equal(BB%*%Sigma0%*%t(BB), diag(1,n-1))) != TRUE)
-  {stop("Error in step 4: construct BB matrix.")}
   
-  ## YY
-  YY <- BB%*%XX
-  
-  ## Step 5: QR decomposition and rotation (transform the problem to an equivalent problem with constant mean difference under H1) ==> YY.tilde
-  
+  ## Step 5: QR decomposition and rotation
   cc <- BB%*%Delta
   AA <- cbind(rep(1,n-1),cc) ## column order!!!
-  
   qrstr <- qr(AA)
   QQ <- qr.Q(qrstr)
   RR <- qr.R(qrstr)
-  ## check
-  if((all.equal(abs(RR[1]) - sqrt(n-1), 0)
-      & all.equal(as.numeric(abs(RR[1,2]) - abs(AA[,1]%*%AA[,2]/sqrt(n-1))), 0)
-      & all.equal(as.numeric(abs(RR[2,2]) - sqrt(AA[,2]%*%AA[,2]-(RR[1,2])^2)), 0)
-      & all.equal(as.numeric(AA[,2]%*%AA[,2] - sum(cc^2)), 0)) != TRUE)
-  {stop("Error in step 5: QR decomposition.")}
-  
+  ## P-map
   Rot <- rbind(RR[,2], c(-1,1)*rev(RR[,2])) / sqrt(sum(cc^2))
   PP <- diag(1,n-1) - QQ%*%t(QQ) + QQ%*%Rot%*%t(QQ)
   if(QQ[1]<0){PP=-PP} ## to ensure that PP%*%cc is parallel to rep(+1,n-1)!!!
   
-  ## check
-  if((all.equal(dim(PP), c(n-1,n-1))
-      & all.equal(as.numeric(PP%*%cc * sqrt(n-1) / sqrt(sum(cc^2))), rep(1,n-1))
-      & all.equal(t(PP)%*%PP, diag(1,n-1))
-      & all.equal(PP%*%t(PP), diag(1,n-1))) != TRUE)
-  {stop("Error in step 5: construct rotation matrix / PP matrix.")}
-  if(sum(PP%*%cc < 0)>0){stop("Error in step 5: PP%*%cc returns negative scalar.")}
-  
-  ## YY.tilde
-  YY.tilde <- drop(PP%*%YY)
-  
   ### output ###
-  return(list("sigma.sq"=sigma.sq, "Sigma0"=Sigma0, "mu.hat"=mu.hat, "XX.tilde"=XX.tilde, "Sigma0.tilde"=Sigma0.tilde, "LL"=LL, "TT"=TT, "BB"=BB, "YY"=YY, "cc"=cc, "QQ"=QQ, "RR"=RR, "Rot"=Rot, "PP"=PP, "YY.tilde"=YY.tilde))
+  return(list("sigma.sq"=sigma.sq, "Sigma0.inv"=Sigma0.inv, "Sigma0.tilde"=Sigma0.tilde, "LL"=LL, "TT"=TT, "BB"=BB, "cc"=cc, "QQ"=QQ, "RR"=RR, "Rot"=Rot, "PP"=PP))
 }
 
 ##############
 ## PBtest() ##
 ##############
 
-PBtest <- function(XX, Sigma, Delta, test="t", ...){
-  YY.tilde <- PBmap(XX, Sigma, Delta)$YY.tilde
-  if(test=="t"){pval <- t.test(YY.tilde, ...)$p.value}
-  if(test=="wilcox"){pval <- wilcox.test(YY.tilde, ...)$p.value}
-  return(pval)
+PBtest <- function(XX, Delta, Sigma=NULL, test="fast.ttest", debug=FALSE, ...)
+{
+  ## check: input data
+  XX <- as.matrix(XX)
+  if(is.numeric(XX) != TRUE){stop("XX must be a numeric matrix.")}
+  if(nrow(XX) != length(Delta)){stop("nrow(XX) must be equal to length(Delta).")}
+
+  ## Step 0: calculate PBmap
+  out.PBmap <- PBmap(Delta, Sigma)
+
+  ## Step 2: estimate mu.hat
+  mu.hat <- colSums(out.PBmap$Sigma0.inv%*%XX)
+  
+  ## Step 3: substract mu.hat from XX ==> XX.tilde
+  XX.tilde <- sweep(XX, 2, mu.hat, "-")
+
+  ## Step 4: transform the problem to an equivalent problem with identity correlation structure ==> YY
+  out.PBmap$BB <- sqrt(out.PBmap$LL) %*% t(out.PBmap$TT) %*% out.PBmap$Sigma0.inv
+  YY <- out.PBmap$BB%*%XX
+  
+  ## Step 5: transform the problem to an equivalent problem with constant mean difference under H1 ==> YY.tilde
+  YY.tilde <- out.PBmap$PP%*%YY
+  
+  ## TESTS
+  if(test=="fast.ttest"){pval <- rowttests(t(YY.tilde))$p.value; names(pval) <- colnames(XX)}
+  if(test=="ttest"){pval <- apply(YY.tilde, 2, FUN = function(z) t.test(z, ...)$p.value)}
+  if(test=="wilcox"){pval <- apply(YY.tilde, 2, FUN = function(z) wilcox.test(z, ...)$p.value)}
+  
+  ### output ###
+  if(debug){return(list("p.value"=pval, "sigma.sq"=out.PBmap$sigma.sq, "Sigma0.inv"=out.PBmap$Sigma0.inv, "mu.hat"=mu.hat, "XX.tilde"=XX.tilde, "Sigma0.tilde"=out.PBmap$Sigma0.tilde, "LL"=out.PBmap$LL, "TT"=out.PBmap$TT, "BB"=out.PBmap$BB, "YY"=YY, "cc"=out.PBmap$cc, "QQ"=out.PBmap$QQ, "RR"=out.PBmap$RR, "Rot"=out.PBmap$Rot, "PP"=out.PBmap$PP, "YY.tilde"=YY.tilde))}
+  else return("p.value"=pval)
 }
-
-
-
-
 
 
 
