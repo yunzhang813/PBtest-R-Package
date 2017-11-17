@@ -7,7 +7,7 @@ Maintainer: Yun Zhang <yun_zhang@urmc.rochester.edu>; Xing Qiu <xing_qiu@urmc.ro
 Description: This package implements a data transformation, namely PB-transformation, which maps data with correlation and heterogeneous variance to an equivalent data that are independent and identically distributed for two-group comparison problem. 
 Depends: R (>= 3.4.1), genefilter
 VignetteBuilder: knitr
-Suggests: knitr, rmarkdown
+Suggests: knitr, rmarkdown, devtools
 License: GPL-3
 Encoding: UTF-8
 LazyData: true

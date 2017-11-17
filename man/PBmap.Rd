@@ -18,7 +18,7 @@ PBtest(XX, Delta, Sigma=NULL, test="fast.ttest", debug=FALSE, ...)
 }
 
 \arguments{
-  \item{XX}{Numeric data matrix.}
+  \item{XX}{Numeric data matrix. Observations in rows and repetitions (e.g. genes) in columns.}
   \item{Sigma}{Covariance matrix. If \code{NULL}, identity matrix will be use.}
   \item{Delta}{Numeric vector of group indication, indicated by 1 and -1.}
   \item{test}{Parametric or nonparametric test. Options: \code{"fast.ttest"} (default), \code{"ttest"} and \code{"wilcox"}.}
@@ -67,7 +67,7 @@ Yun Zhang, Xing Qiu
 \examples{
 ## Generate some data.
 n1 <- 5; n2 <- 5; n <- n1+n2
-XX <- rnorm(n)
+XX <- matrix(rnorm(n), nrow=n)
 Delta <- rep(c(1,-1), c(n1,n2))
 ## A general coveriance matrix.
 weights <- runif(n, 1, 6)
@@ -83,9 +83,6 @@ mymap$PP  #matrix for P-map
 ## By default, two-sided t-test is performed. 
 PBtest(XX, Delta, Sigma)
 
-## By default, two-sided t-test is performed. 
-system.time(PBtest(XX, Delta, Sigma)) #speed efficient
-system.time(PBtest(XX, Delta, Sigma, test="ttest"))
 ## One-sided t-test.
 PBtest(XX, Delta, Sigma, test="ttest", alternative="greater")
 
@@ -94,11 +91,9 @@ PBtest(XX, Delta, Sigma, test="wilcox")
 ## One-sided rank-based test.
 PBtest(XX, Delta, Sigma, test="wilcox", alternativ="less")
 
-## If Sigma=NULL (i.e. identity matrix), the parametric test reduces to two-sample t-test.
-PBtest(XX, Delta)
-t.test(XX[Delta==1], XX[Delta==-1], var.equal=TRUE)$p.value
-PBtest(XX, Delta, test="ttest", alternative="greater")
-t.test(XX[Delta==1], XX[Delta==-1], var.equal=TRUE, alternative="greater")$p.value
+## If Sigma=NULL (i.e. identity matrix), the parametric test reduces to the two-sample Student's t-test.
+PBtest(XX[,1], Delta) #just use the first column of data
+t.test(XX[Delta==1,1], XX[Delta==-1,1], var.equal=TRUE)$p.value
 
 ## debug
 PBtest(XX, Delta, Sigma, debug=TRUE)
