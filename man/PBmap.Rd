@@ -67,7 +67,7 @@ Yun Zhang, Xing Qiu
 \examples{
 ## Generate some data.
 n1 <- 5; n2 <- 5; n <- n1+n2
-XX <- matrix(rnorm(n), nrow=n)
+XX <- matrix(rnorm(100*n), nrow=n)
 Delta <- rep(c(1,-1), c(n1,n2))
 ## A general coveriance matrix.
 weights <- runif(n, 1, 6)
