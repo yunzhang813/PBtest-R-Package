@@ -1,4 +1,13 @@
-importFrom("stats", "t.test", "wilcox.test")
-importFrom("genefilter", "rowttests")
 
-exportPattern(PBmap, PBtest)
+importFrom(genefilter, rowttests)
+
+importFrom(MASS, ginv)
+importClassesFrom(Matrix, Matrix)
+importFrom(Matrix, sparseMatrix, rankMatrix)
+importMethodsFrom(Matrix, t, isSymmetric, "%*%", solve, diag, chol, chol2inv, forceSymmetric, "*")
+
+importFrom("stats", "model.matrix", "pt", "lm")
+importFrom("methods", "as", "is")
+
+
+exportPattern(PBmap, PBtest, KRapprox, getRho, getSigma)
