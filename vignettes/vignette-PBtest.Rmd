@@ -30,7 +30,7 @@ library(PBtest)
 
 This R package is built for the PB-transformed parametric and semi-parametric test, which are computationally efficient hypothesis testing methods for correlated observations and heterogeneous variance structure. A graphical illustration of the transformations is provided below. For more technical details, please refer to @zhang2019highly. 
 
-![A graphical illustration of PB-transformaion.](figure2.png){ width=80% }
+![A graphical illustration of PB-transformaion.](figure2.png){ width=90% }
 
 
 In this documentation, we present a working example for two-group comparison, where the data are contaminated with correlated observations and heterogeneous data qualities. Using the working example, we compare several aspects of the PB-transformed t-test and an alternative approach using liner mixed-effects model (LMER), including adjusted degrees of freedom (DF), correlation estimation, and **computational time**. **The PB-transformed test is 300 times faster than the LMER approach.**
