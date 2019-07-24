@@ -32,7 +32,7 @@ The \code{getRho} function returns the individual or average correlation estimat
 }
 
 \references{
-  \cite{Yun Zhang, Gautam Bandyopadhyay, and Xing Qiu. (2018) Highly efficient hypothesis testing methods for regression-type tests with correlated observations and heterogeneous variance structure. Submitted.}
+  \cite{Zhang et al. (2019) Highly efficient hypothesis testing methods for regression-type tests with correlated observations and heterogeneous variance structure. BMC Bioinformatics, 20:185.}
 }
 
 \author{

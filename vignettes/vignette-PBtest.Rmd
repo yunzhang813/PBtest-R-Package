@@ -28,7 +28,7 @@ install_github("yunzhang813/PBtest-R-Package", build_vignettes=TRUE)
 library(PBtest)
 ```
 
-This R package is built for the PB-transformed parametric and semi-parametric test, which are computationally efficient hypothesis testing methods for correlated observations and heterogeneous variance structure. A graphical illustration of the transformations is provided below. For more technical details, please refer to @zhang2018highly. 
+This R package is built for the PB-transformed parametric and semi-parametric test, which are computationally efficient hypothesis testing methods for correlated observations and heterogeneous variance structure. A graphical illustration of the transformations is provided below. For more technical details, please refer to @zhang2019highly. 
 
 ![A graphical illustration of PB-transformaion.](figure2.png){ width=80% }
 
@@ -44,7 +44,7 @@ In this package, we provide the one-step testing function `PBtest()` and other u
 
 ## One-step testing function: `PBtest()`
 
-* `PBtest(YY, xx, Sigma=NULL, test="t", id=NULL, weights=NULL, debug=FALSE)` conducts the PB-transformed t-test (with `test="t"`) or the PB-transformed Wilcoxon test (with `test="wilcox"`), and directly outputs a list of p-value(s) (`$p.value`), test statistic(s) (`$statistic`), and adjusted degrees of freedom (`$df`) by `KRapprox()` (see below). The input data are `YY` and `xx`. Depending on different levels of *a priori* information, the following options are available.
+* `PBtest(YY, xx, Sigma=NULL, test="t", id=NULL, weights=NULL, debug=FALSE)` conducts the PB-transformed t-test (with `test="t"`) or the PB-transformed Wilcoxon test (with `test="wilcox"`), and directly outputs a list of p-value(s) (`$p.value`), test statistic(s) (`$statistic`), and adjusted degrees of freedom (`$df`) by `KRapprox()` (see below). The input data are `YY` and `xx`. In the context of gene differential analysis, `YY` is the gene expression matrix with samples in rows and genes in columns; and `xx` is the group indictor vector corresponding to the rows of `YY`. Depending on different levels of *a priori* information, the following options are available.
     + If `Sigma` is known, set `Sigma=Sigma` and leave `id=NULL, weights=NULL`.
     + If `Sigma` is unknown, the one-step function estimates `Sigma` using `getSigma()` (see below). In the arguments here, set `Sigma=NULL, id=id, weights=weights` or `NULL`. If `weights=NULL`, equal weights of 1 will be assigned.
     + If `Sigma=NULL, id=NULL, weights=NULL`, the identity matrix will be used for `Sigma`.
@@ -54,7 +54,7 @@ In this package, we provide the one-step testing function `PBtest()` and other u
 
 * The `debug=TRUE` option and `PBmap()`. These will provide more insights of the testing procedure. They output a long list of intermediate products, e.g. PB-transformed data (`$YY.tilde`), B-map (`$BB`), and P-map (`$PP`).
 
-* Correlation estimation for repeated measurements: `getSigma()` and `getRho()`. These functions implement the moment estimator of correlation proposed in @zhang2018highly, which are used to estimate the `Sigma` in the one-step function if unknown.
+* Correlation estimation for repeated measurements: `getSigma()` and `getRho()`. These functions implement the moment estimator of correlation proposed in @zhang2019highly, which are used to estimate the `Sigma` in the one-step function if unknown.
 
 * Kenward-Roger approximation to the degrees of freedom: `KRapprox()`. This function calculates the adjusted degrees of freedom using Kenward-Roger approximation. It is modified from the `pbkrtest` package. Please also refer to @halekoh2014kenward.
 

@@ -23,7 +23,7 @@ Simulated data of 2000 genes (1000 null genes and 1000 differentially expressed 
 }
 
 \references{
-  \cite{Yun Zhang, Gautam Bandyopadhyay, and Xing Qiu. (2018) Highly efficient hypothesis testing methods for regression-type tests with correlated observations and heterogeneous variance structure. Submitted.}
+  \cite{Zhang et al. (2019) Highly efficient hypothesis testing methods for regression-type tests with correlated observations and heterogeneous variance structure. BMC Bioinformatics, 20:185.}
 }
 
 \examples{

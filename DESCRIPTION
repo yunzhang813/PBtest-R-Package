@@ -5,7 +5,7 @@ Date: 2018-05-25
 Author: Yun Zhang, Xing Qiu 
 Maintainer: Yun Zhang <yun_zhang@urmc.rochester.edu>; Xing Qiu <xing_qiu@urmc.rochester.edu>
 Description: This package implements the PB-transformed t-test and PB-transformed Wilcoxon test for weighted and correlated data. 
-Depends: R (>= 3.4.1)
+Depends: R (>= 3.0.0)
 Imports: genefilter, Matrix (>= 1.2.3), stats, methods, MASS
 VignetteBuilder: knitr
 Suggests: knitr, rmarkdown, devtools, pbkrtest, lmerTest

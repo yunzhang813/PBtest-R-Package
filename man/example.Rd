@@ -25,7 +25,7 @@ We downloaded a set of RNA-seq gene expression data from The Cancer Genome Atlas
 \references{
   The Cancer Genome Atlas (TCGA) \url{https://cancergenome.nih.gov/}.
 
-  \cite{Yun Zhang, Gautam Bandyopadhyay, and Xing Qiu. (2018) Highly efficient hypothesis testing methods for regression-type tests with correlated observations and heterogeneous variance structure. Submitted.}
+  \cite{Zhang et al. (2019) Highly efficient hypothesis testing methods for regression-type tests with correlated observations and heterogeneous variance structure. BMC Bioinformatics, 20:185.}
 }
 
 \examples{
