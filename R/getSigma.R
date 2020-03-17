@@ -71,7 +71,7 @@ getRho <- function(YY, xx, id, weights, correction=TRUE, return.all=FALSE){
   
   ## average over individal rhos
   rho.hat.all <- sapply(my.split(res.lm1.o), getRho.each, id1.o=id1.o)
-  rho.hat <- mean(rho.hat.all)
+  rho.hat <- mean(rho.hat.all, na.rm = TRUE)
   
   ## output
   if(return.all) return(rho.hat.all)
